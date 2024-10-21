@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -44,6 +45,7 @@ func ShortenUrl(c *fiber.Ctx) error {
 		if err := db.Save(&url).Error; err != nil {
 			return c.Status(500).SendString(err.Error())
 		}
+
 
 		rdb.Set(ctx, url.Short_url, url.Original_url, ttl)
 		return c.JSON(url.Short_url)
@@ -96,7 +98,14 @@ func SetUsageCount(url *model.Url, c *fiber.Ctx) error {
 
 func DeleteShortenUrl(c *fiber.Ctx) error {
 
-	var delete_url = os.Getenv("BASE_URL") + c.Params("deleteUrl")
+	var delete_body  RequestUrl
+
+	if err := c.BodyParser(&delete_body); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	delete_url := delete_body.Data
+	fmt.Println("umut antalya: " + delete_url)
 
 	var url model.Url
 	if err := database.Connection().Model(&model.Url{}).Where("short_url = ?", delete_url).First(&url).Error; err != nil {
