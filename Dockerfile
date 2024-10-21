@@ -3,12 +3,12 @@ FROM golang:1.23-alpine
 WORKDIR /app
 
 COPY go.mod go.sum ./
-RUN go.mod download
+RUN go mod download
 
-COPY ..
+COPY . .
 
-RUN go build -o /url-shortener/cmd/server/main.go ./cmd/server
+RUN go build -o /shorten-url/cmd/main ./cmd
 
 EXPOSE 3000
 
-CMD ["./main"]
+CMD ["/shorten-url/cmd/main"]
